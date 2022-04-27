@@ -10,7 +10,7 @@
 ;Comisión 1 - Grupo 7
 ;__________________________________________
 
-;El Estado es un Number, que representa el tamaño del radio del círculo representado
+;El Estado es un Number, que representa el tamaño del radio (en píxeles) del círculo representado
 ;en pantalla.
 
 (define ALTURA-ESCENA 300)
@@ -38,11 +38,9 @@
 ;la cual será mostrada por la computadora.
 
 (define (mostrar-figura tamaño)
-  (overlay (text (number->string tamaño) (+ tamaño 1) "gray")
-           (circle tamaño "solid" (clasificador-tamaño tamaño))
+  (overlay (circle tamaño "solid" (clasificador-tamaño tamaño))
            (empty-scene ALTURA-ESCENA ANCHO-ESCENA))
   )
-
 
 
 ;disminuir-tamaño: Estado -> Estado
@@ -57,7 +55,6 @@
   (if (= tamaño 0) RADIO-INICIAL (- tamaño 1)
   )
   )
-
 
 
 ;incrementar-tamaño: Estado -> Estado
@@ -81,7 +78,7 @@
 (check-expect (reajuste-diametro 100 "a") 100)
 
 (define (reajuste-diametro tamaño tecla)
-  (if (and (string-numeric? tecla) (< (string->number tecla) 10))
+  (if (string-numeric? tecla) 
       (* 10 (string->number tecla))
       tamaño
       )

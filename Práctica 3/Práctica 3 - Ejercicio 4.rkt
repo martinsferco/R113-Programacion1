@@ -10,7 +10,7 @@
 ;Comisión 1 - Grupo 7
 ;__________________________________________
 
-;El Estado es un Number, que representa la posición vertical sobre la que se dibujará
+;El Estado es un Number, que representa la coordenada vertical sobre la que se dibujará
 ;un círculo.
 
 (define ALTURA-ESCENA 1000)

@@ -30,17 +30,29 @@
              (empty-scene ANCHO-ESCENA ALTO-ESCENA))
   )
 
+;remover-ultimo: String -> String
+;Dado un estado, nos devuelve el el estado con el último caracter removido.
+
+(define (remover-ultimo estado)
+  (substring estado 0 (- (string-length estado) 1) )
+  )
+
+
 ;teclear: Estado Tecla -> Estado
+;Dado el estado actual y la tecla presionada, devuelve un Estado nuevo, con la tecla
+;presionada, adicionada al final.
 
 (check-expect (teclear " " "\b") "")
 (check-expect (teclear "" "\b") "")
 (check-expect (teclear "A " "\b") "A")
 (check-expect (teclear "hola" "\b") "hol")
+(check-expect (teclear "hola" "a") "holaa")
+(check-expect (teclear "hola" "A ") "holaA ")
 
 (define (teclear estado tecla)
   (cond [(string=? tecla "\b") (if (= 0 (string-length estado))
                                    estado
-                                   (substring estado 0 (- (string-length estado) 1) ))]
+                                   (remover-ultimo estado))]
         [else (string-append estado tecla)]
         )
   

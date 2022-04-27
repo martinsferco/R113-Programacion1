@@ -16,7 +16,7 @@
 ;La distancia entre el punto y el origen de coordenadas la representamos con un número.
 
 ;distancia_origen: Number Number -> Number
-;distancia_origen toma las coordenadas de un punto y devuelve la distancia al origen.
+;distancia_origen toma las coordenadas de un punto y devuelve la distancia al origen de dicho punto.
 
 (check-expect (distancia_origen 4 3) 5)
 (check-expect (distancia_origen -4 -3) 5)
@@ -26,6 +26,8 @@
 (define (distancia_origen x y)
         (sqrt(+ (sqr x)(sqr y)))
   )
+
+
 ;__________________________________________
 ;Ejercicio 2)-
 
@@ -34,7 +36,7 @@
 ;La distancia entrel los puntos la representamos con un número.
 
 ;distancia_puntos: Number Number Number Number -> Number
-;distancia_punto toma las coordenadas de dos puntos y devuelve la distancia entre ambos
+;distancia_punto toma las coordenadas de dos puntos y devuelve la distancia entre ambos.
 
 
 (check-expect (distancia_puntos 0 0 4 3) 5)
@@ -45,6 +47,8 @@
 (define (distancia_puntos x1 y1 x2 y2)
         (sqrt (+ (sqr (- x1 x2))(sqr (- y1 y2))))
   )
+
+
 
 ;__________________________________________
 ;Ejercicio 3)-
@@ -58,14 +62,14 @@
 (check-expect (vol-cubo 0) 0)
 (check-expect (vol-cubo 1) 1)
 (check-expect (vol-cubo 2) 8)
-(check-expect (vol-cubo -1) "No se admiten valor negativos")
 
 (define (vol-cubo arista)
         (if (< arista 0)
-            "No se admiten valor negativos"
+            (error "No se admiten valores negativos")
             (expt arista 3)
             )
   )
+
 
 ;__________________________________________
 ;Ejercicio 4)-
@@ -79,11 +83,10 @@
 (check-expect (area-cubo 0) 0)
 (check-expect (area-cubo 1) 6)
 (check-expect (area-cubo 2) 24)
-(check-expect (area-cubo -1) "No se admiten valor negativos")
 
 (define (area-cubo arista)
         (if (< arista 0)
-            "No se admiten valor negativos"
+            (error "No se admiten valores negativos")
             (* 6 (sqr arista))
             )
   )
@@ -115,16 +118,18 @@
 ;Representamos a la frase con un String.
 
 ;string-last: String -> String
-;Toma una cadena no vacía y nos devuelve el último caracter de dicha cadena
+;Toma una cadena no vacía y nos devuelve el último caracter de dicha cadena. Consideramos que el
+;último caracter de una cadena vacía es una cadena vacía.
 
-(check-expect (string-last "") "No se admiten cadenas vacías")
+(check-expect (string-last "") "")
 (check-expect (string-last "Hola") "a")
 
 (define (string-last s)
-  (cond [(string=? "" s) "No se admiten cadenas vacías"]
+  (cond [(string=? "" s) ""]
         [else (string-ith s (- (string-length s) 1))]
         )
   )
+
 
 ;__________________________________________
 ;Ejercicio 7)-
@@ -132,33 +137,28 @@
 ;Representamos a la frase con un String.
 
 ;string-remove-last: String -> String
-;Toma una cadena no vacía y nos devuelve la cadena sin el último caracter
+;Toma una cadena no vacía y nos devuelve la cadena sin el último caracter.
 
-(check-expect (string-remove-last "") "No se admiten cadenas vacías")
+
 (check-expect (string-remove-last "Hola") "Hol")
 
 (define (string-remove-last s)
-  (cond [(string=? "" s) "No se admiten cadenas vacías"]
+  (cond [(string=? "" s) (error "No se admiten cadenas vacías")]
         [else (substring s 0 (- (string-length s) 1))]
         )
   )
 
 ;__________________________________________
-;Ejercicio 9)- CORREGIR
+;Ejercicio 9)
 
 ;Reprensetarmoes la cantidad de personas que se quieren anotar, y la cantidad de meses
 ;que pagan, con números.
-;La salida nos devolverá un String en donde se indique el precio a pagar por persona
+;Los precios serán en pesos, y los representaremos con números.
+;Los descuentos, serán representados como números decimales.
+;La salida nos devolverá un String en donde se indique el precio a pagar por persona.
 
-;monto-persona: Number Number -> String
-;Toma una cantidad de personas y cuantos meses se anotan al instituto, y nos devuelve en forma de mensaje
-;cuanto debe pagar cada uno.
 
-(check-expect (monto-persona 2 2) "Cada estudiante deberá abonar $975")
-(check-expect (monto-persona 1 1) "El estudiante deberá abonar $650")
-(check-expect (monto-persona 2 1) "Cada estudiante deberá abonar $585")
-;VERIFICAR (check-expect (monto-persona 3 3) "Cada estudiante deberá abonar $1267.50") 
-;VERIFICAR (check-expect (monto-persona 1 5) "El estudiante deberá abonar $2437.5")
+;Definimos algunas variables importantes
 
 (define CUOTA 650.0) ;Precio cuota en pesos
 
@@ -170,6 +170,16 @@
 
 (define MAX_DESCUENTO 0.35)
 
+;monto-persona: Number Number -> String
+;Toma una cantidad de personas y cuantos meses se anotan al instituto, y nos devuelve en forma de mensaje
+;cuanto debe pagar cada uno.
+
+(check-expect (monto-persona 2 2) "Cada estudiante deberá abonar $975")
+(check-expect (monto-persona 1 1) "El estudiante deberá abonar $650")
+(check-expect (monto-persona 2 1) "Cada estudiante deberá abonar $585")
+;VERIFICAR (check-expect (monto-persona 3 3) "Cada estudiante deberá abonar $1267.50") 
+;VERIFICAR (check-expect (monto-persona 1 5) "El estudiante deberá abonar $2437.5")
+
 (define (monto-persona cant-personas cant-meses)
   (if (< (descuento-promociones cant-personas cant-meses) MAX_DESCUENTO)
       (mensaje-monto cant-personas (* cant-meses CUOTA (- 1 (descuento-promociones cant-personas cant-meses))))
@@ -177,7 +187,7 @@
       )
   )
 
-;descuento: Number Number -> Number
+;descuento-promociones: Number Number -> Number
 ;Toma una cantidad de personas y los meses que pagan, y nos devuelve cual es su descuento
 ;de promociones correspondiente.
 
@@ -196,8 +206,6 @@
      )
   )
 
-;El monto a pagar y la cantidad de personas lo representaremos con un número.
-;La salida la reprensetaremos con un String, combinando el monto a pagar con una frase
 
 ;mensaje-monto: Number Number -> String
 ;Toma una cantidad de personas y cuanto debe pagar cada una, y nos devuelve el mensaje adecuado,
@@ -219,8 +227,16 @@
 ;__________________________________________
 ;Ejercicio 10)-
 
-;Representaremos la edad de la persona en meses con un Number.
-;El resultado de su condición se espresará con un Boolean
+;Representaremos la edad de la persona en meses con un Number, sabiendo que la equivalencia entre
+;año y meses es de 1 año = 12 meses.
+;El resultado de su condición se expresará con un Boolean
+
+(define MIN_1MONTH 13)
+(define MIN_6MONTHS 10)
+(define MIN_1YEAR 11)
+(define MIN_5YEARS 11.5)
+(define MIN_10YEARS 12.6)
+(define MIN_MORE_10YEARS 13)
 
 ;anemia: Number Number -> Boolean
 ;Recibe la edad en meses y el nivel de hemogoblina de una persona, y nos expresa
@@ -231,22 +247,13 @@
 (check-expect (anemia 150 15) #f)
 (check-expect (anemia 45 11) #t)
 
-(define MIN_1MONTH 13)
-(define MIN_6MONTHS 10)
-(define MIN_1YEAR 11)
-(define MIN_5YEARS 11.5)
-(define MIN_10YEARS 12.6)
-(define MIN_MORE_10YEARS 13)
-
-;Sabemos que la equivalencia entre año y meses es 1 año = 12 meses.
-
 (define (anemia edad hemoglobina)
-  (cond [(<= edad 1) (if (< hemoglobina MIN_1MONTH) #t #f)]
-        [(<= edad 6) (if (< hemoglobina MIN_6MONTHS) #t #f)]
-        [(<= edad 12) (if (< hemoglobina MIN_1YEAR) #t #f)]
-        [(<= edad 60) (if (< hemoglobina MIN_5YEARS) #t #f)]
-        [(<= edad 120) (if (< hemoglobina MIN_10YEARS) #t #f)]
-        [else (if (< hemoglobina MIN_MORE_10YEARS) #t #f)]
+  (cond [(<= edad 1) (< hemoglobina MIN_1MONTH)]
+        [(<= edad 6) (< hemoglobina MIN_6MONTHS)]
+        [(<= edad 12) (< hemoglobina MIN_1YEAR)]
+        [(<= edad 60) (< hemoglobina MIN_5YEARS)]
+        [(<= edad 120) (< hemoglobina MIN_10YEARS)]
+        [else (< hemoglobina MIN_MORE_10YEARS)]
         )
   )
 

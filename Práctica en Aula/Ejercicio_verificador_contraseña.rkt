@@ -35,11 +35,11 @@
   )
 
 
-;La contra será representada con un string.
-;La respuesta sobre cuales reglas no se cumplieron será un string.
+
 
 ;verificador_regla: String -> String
-;Dada una cadena que representa una contra, devuelve cuales fueron las reglas que fallaron.
+;Dada una cadena que representa una contra, devuelve cuales fueron las reglas que fallaron,
+;en forma de String.
 
 (check-expect (verificador_regla "Nicolas2010") "")
 (check-expect (verificador_regla "Nico") " R1")

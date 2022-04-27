@@ -22,7 +22,7 @@
 
 (define COLOR-ESTRELLA "yellow")
 (define TAMAÑO-MAXIMO-ESTRELLA 50)
-(define FACTOR 0.2) ;Determina el factor de reducción que alcanzan las estrellas totalmente a la izquierda.
+(define FACTOR 0.2) ;Determina el factor de reducción que tienen las estrellas totalmente a la izquierda.
 (define TAMAÑO-MINIMO-ESTRELLA (* FACTOR TAMAÑO-MAXIMO-ESTRELLA))
 
 ;graficador: Estado -> Image
@@ -75,18 +75,17 @@
       )
   )
 
-
 ;coloca-estrellas: Estado -> Estado
-;Recibe el estado actual, y si si clickea en una zona del cielo, se le agrega una nueva estrella,
+;Recibe el estado actual, y si se clickea en una zona del cielo, se le agrega una nueva estrella,
 ;generando un nuevo estado. Las estrellas siempre tienen que estar completamente incluidas en la
 ;escena.
 
 (define (coloca-estrellas cielo x y acción)
   (cond [(string=? acción "button-down")
          (if (verificador-click x y)
-             (place-image (estrella x)
-             x y cielo)
+             (place-image (estrella x) x y cielo)
              cielo)]
+
         [else cielo]
         )
   )
@@ -101,7 +100,6 @@
         [else cielo]
         )
   )
-
 
 
 
