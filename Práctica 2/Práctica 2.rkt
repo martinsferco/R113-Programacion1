@@ -152,7 +152,7 @@
 ;Ejercicio 9)
 
 ;Reprensetarmoes la cantidad de personas que se quieren anotar, y la cantidad de meses
-;que pagan, con números.
+;que pagan con números.
 ;Los precios serán en pesos, y los representaremos con números.
 ;Los descuentos, serán representados como números decimales.
 ;La salida nos devolverá un String en donde se indique el precio a pagar por persona.
@@ -169,23 +169,6 @@
 (define 3_MESES 0.25) ;Descuento 3 meses o más
 
 (define MAX_DESCUENTO 0.35)
-
-;monto-persona: Number Number -> String
-;Toma una cantidad de personas y cuantos meses se anotan al instituto, y nos devuelve en forma de mensaje
-;cuanto debe pagar cada uno.
-
-(check-expect (monto-persona 2 2) "Cada estudiante deberá abonar $975")
-(check-expect (monto-persona 1 1) "El estudiante deberá abonar $650")
-(check-expect (monto-persona 2 1) "Cada estudiante deberá abonar $585")
-;VERIFICAR (check-expect (monto-persona 3 3) "Cada estudiante deberá abonar $1267.50") 
-;VERIFICAR (check-expect (monto-persona 1 5) "El estudiante deberá abonar $2437.5")
-
-(define (monto-persona cant-personas cant-meses)
-  (if (< (descuento-promociones cant-personas cant-meses) MAX_DESCUENTO)
-      (mensaje-monto cant-personas (* cant-meses CUOTA (- 1 (descuento-promociones cant-personas cant-meses))))
-      (mensaje-monto cant-personas (* cant-meses CUOTA (- 1 MAX_DESCUENTO)))
-      )
-  )
 
 ;descuento-promociones: Number Number -> Number
 ;Toma una cantidad de personas y los meses que pagan, y nos devuelve cual es su descuento
@@ -206,10 +189,9 @@
      )
   )
 
-
 ;mensaje-monto: Number Number -> String
 ;Toma una cantidad de personas y cuanto debe pagar cada una, y nos devuelve el mensaje adecuado,
-;sobre cuanto tiene queb pagar cada uno.
+;sobre cuanto tiene que pagar cada uno.
 
 (check-expect (mensaje-monto 1 900) "El estudiante deberá abonar $900")
 (check-expect (mensaje-monto 2 900) "Cada estudiante deberá abonar $900")
@@ -224,12 +206,30 @@
   )
 
 
+;monto-persona: Number Number -> String
+;Toma una cantidad de personas y cuantos meses se anotan al instituto, y nos devuelve en forma de mensaje
+;cuanto debe pagar cada uno.
+
+(check-expect (monto-persona 2 2) "Cada estudiante deberá abonar $975")
+(check-expect (monto-persona 1 1) "El estudiante deberá abonar $650")
+(check-expect (monto-persona 2 1) "Cada estudiante deberá abonar $585")
+;VERIFICAR (check-expect (monto-persona 3 3) "Cada estudiante deberá abonar $1267.50") 
+;VERIFICAR (check-expect (monto-persona 1 5) "El estudiante deberá abonar $2437.5")
+
+(define (monto-persona cant-personas cant-meses)
+  (if (< (descuento-promociones cant-personas cant-meses) MAX_DESCUENTO)
+      (mensaje-monto cant-personas (* cant-meses CUOTA (- 1 (descuento-promociones cant-personas cant-meses))))
+      (mensaje-monto cant-personas (* cant-meses CUOTA (- 1 MAX_DESCUENTO)))
+      )
+  )
+
+
 ;__________________________________________
 ;Ejercicio 10)-
 
 ;Representaremos la edad de la persona en meses con un Number, sabiendo que la equivalencia entre
 ;año y meses es de 1 año = 12 meses.
-;El resultado de su condición se expresará con un Boolean
+;El resultado de su condición se expresará con un Boolean.
 
 (define MIN_1MONTH 13)
 (define MIN_6MONTHS 10)
@@ -263,6 +263,18 @@
 ;Vamos a representar a cada uno de los números a,b,c con valores tipo Number.
 ;La salida, la representaremos con valores tipo Number.
 
+;ver-prom: Number Number Number -> Boolean
+;Dados tres números, devuelve True si el primero de ellos es promedio de los otros dos,
+;o False en caso contrario.
+
+(check-expect (ver-prom 10 10 10) #t)
+(check-expect (ver-prom 9 10 10) #f)
+(check-expect (ver-prom 7 5 9) #t)
+
+(define (ver-prom a b c)
+  (= a (/ (+ b c) 2))
+  )
+
 ;autopromediable: Number Number Number -> Number
 ;Dados tres números, devuelva el producto de ellos en caso que formen una terna
 ;autopromediable, y la suma de los mismos en caso contrario. Se dice que una terna es autopromediable
@@ -280,20 +292,6 @@
       )
   )
 
-
-;ver-prom: Number Number Number -> Boolean
-;Dados tres números, devuelve True si el primero de ellos es promedio de los otros dos,
-;o False en caso contrario
-
-(check-expect (ver-prom 10 10 10) #t)
-(check-expect (ver-prom 9 10 10) #f)
-(check-expect (ver-prom 7 5 9) #t)
-
-(define (ver-prom a b c)
-  (= a (/ (+ b c) 2))
-  )
-
-
 ;__________________________________________
 ;Ejercicio 12)-
 
@@ -301,27 +299,10 @@
 ;Representaremos la clase de combustible con un String, el cual será "Grado 2" o "Grado 3".
 ;La autonomía restante en ciudad y ruta, la representaremos con un String.
 
-;autonomia: Number String -> String
-;Dada la cantidad de litros restantes, y el tipo de combustible que estamos utilizando,
-;devuelve la autonomía en ciudad y ruta.
-
-(check-expect (autonomia 20 "Grado 2") "Autonomía en ciudad: 160km. Autonomía en ruta: 220km.")
-(check-expect (autonomia 20 "Grado 3") "Autonomía en ciudad: 176km. Autonomía en ruta: 242km.")
-(check-expect (autonomia 20 "Grado 1") "Ingrese un tipo correcto de combustible.")
-
-
 (define CITY_G2 8)  ;en km/l
 (define ROAD_G2 11) ;en km/l
 
 (define IMPROVE_G3 0.1) ;Mejora Grado 3
-
-(define (autonomia litros combustible)
-  (cond [(string=? combustible "Grado 2") (mensaje_autonomia (* litros CITY_G2)(* litros ROAD_G2))]
-        [(string=? combustible "Grado 3") (mensaje_autonomia (* litros CITY_G2 (+ 1 IMPROVE_G3))
-                                                 (* litros ROAD_G2 (+ 1 IMPROVE_G3)))]
-        [else "Ingrese un tipo correcto de combustible."])
-  )
-
 
 
 ;mensaje: Number Number -> String
@@ -334,5 +315,35 @@
   (string-append "Autonomía en ciudad: " (number->string city)
                  "km. Autonomía en ruta: " (number->string road) "km.")
   )
+
+
+;autonomia: Number String -> String
+;Dada la cantidad de litros restantes, y el tipo de combustible que estamos utilizando,
+;devuelve la autonomía en ciudad y ruta.
+
+(check-expect (autonomia 20 "Grado 2") "Autonomía en ciudad: 160km. Autonomía en ruta: 220km.")
+(check-expect (autonomia 20 "Grado 3") "Autonomía en ciudad: 176km. Autonomía en ruta: 242km.")
+(check-expect (autonomia 20 "Grado 1") "Ingrese un tipo correcto de combustible.")
+
+(define (autonomia litros combustible)
+  (cond [(string=? combustible "Grado 2") (mensaje_autonomia (* litros CITY_G2)(* litros ROAD_G2))]
+        [(string=? combustible "Grado 3") (mensaje_autonomia (* litros CITY_G2 (+ 1 IMPROVE_G3))
+                                                             (* litros ROAD_G2 (+ 1 IMPROVE_G3)))]
+        
+        [else "Ingrese un tipo correcto de combustible."]
+        )
+  )
+
+
+(= 4 3)
+
+(string=? "hola" "hola")
+
+(boolean=?)
+(boolean? )
+(image=?)
+
+
+
 
 
