@@ -21,32 +21,87 @@
 (define COLOR-FIGURA "lightgreen")
 (define CIRCULO (circle RADIO-CIRCULO "solid" COLOR-FIGURA))
 
-(define DELTA 20) ;Cantidad de desplazamiento en pixeles usando el teclado
+(define DELTA 23) ;Cantidad de desplazamiento en pixeles usando el teclado
 
-;representador-estado: Estado -> Image
+(define INITIAL-STATE (make-posn (/ ANCHO-ESCENA 2)(/ ALTO-ESCENA 2)))
+(define FINAL-STATE (make-posn -1 -1))
+
+
+;posn=?: posn posn -> Boolean
+;Toma dos datos de tipo posn y nos devuelve #t si son iguales.
+;En caso contrario devuelve #f.
+
+(define (posn=? posn1 posn2)
+  (and (= (posn-x posn1)(posn-x posn2)) (= (posn-y posn1)(posn-y posn2)))
+  )
+
+;render-state: Estado -> Image
 ;Recibe el estado actual y nos devuelve una imagen de la figura colocada
 ;en una escena, colocada donde indican las coordenadas del estado.
 
-(define (representador-estado estado)
-  (place-image CIRCULO (posn-x estado)(posn-y estado) ESCENA))
+(define (render-state state)
+  (if (not (posn=? state FINAL-STATE))
+      (place-image CIRCULO (posn-x state)(posn-y state) ESCENA)
+      (place-image (text "FINIQUITADO" 100 "black") (/ ANCHO-ESCENA 2)(/ ALTO-ESCENA 2) ESCENA))
+  )
 
 
-;desplazar-figura-teclado: Estado String -> Estado
+;verificar-mover-teclado: Estado Tecla -> Boolean
+;Dado el estado actual y para donde se quiere desplazar, nos devuelve #t
+;si es posible mover en dicho sentido la figura sin que se nos salga de
+;la escena. En caso contrario devuelve #f.
+
+(define (verificar-mover-teclado estado tecla)
+  (cond [(string=? tecla "up") (>= (- (posn-y estado) DELTA RADIO-CIRCULO) 0)]
+        [(string=? tecla "down")(<= (+ (posn-y estado) DELTA RADIO-CIRCULO) ALTO-ESCENA)]
+        [(string=? tecla "right") (<= (+ (posn-x estado) DELTA RADIO-CIRCULO) ANCHO-ESCENA)]
+        [(string=? tecla "left") (>= (- (posn-x estado) DELTA RADIO-CIRCULO) 0)]
+        )
+  )
+
+
+;corregir-posicion: Estado String -> Estado
+;Dado el estado actual y la tecla que se presiono, nos devuelve la coordenada
+;en la que la figura no se sale de la escena. Consideramos que esta funcion es
+;llamada cuando tenemos un desplazamiento que produce que la imagen se salga de
+;pantalla, por lo que no verificamos las coordenadas del estado.
+
+(define (corregir-posicion estado tecla)
+  (cond [(key=? tecla "up") (make-posn (posn-x estado) RADIO-CIRCULO)]
+        [(key=? tecla "down")(make-posn (posn-x estado) (- ALTO-ESCENA RADIO-CIRCULO))]
+        [(key=? tecla "left") (make-posn RADIO-CIRCULO (posn-y estado) )]
+        [(key=? tecla "right") (make-posn (- ANCHO-ESCENA RADIO-CIRCULO) (posn-y estado))]
+        )
+  )
+
+;keyboard-handler: Estado String -> Estado
 ;Dado el estado actual y la tecla presionada, nos devuelve un nuevo estado
 ;de acuerdo a si se presiono alguna de las flechas direccionales, las cuales
 ;desplazan a la figura en el sentido que sus nombres indican.
 
-(check-expect (desplazar-figura-teclado (make-posn 50 50) "up") (make-posn 50 (- 50 DELTA)))
-(check-expect (desplazar-figura-teclado (make-posn 50 50) "down") (make-posn 50 (+ 50 DELTA)))
-(check-expect (desplazar-figura-teclado (make-posn 50 50) "right") (make-posn (+ 50 DELTA) 50))
-(check-expect (desplazar-figura-teclado (make-posn 50 50) "left") (make-posn (- 50 DELTA) 50))
-(check-expect (desplazar-figura-teclado (make-posn 50 50) "k") (make-posn 50 50))
+(check-expect (keyboard-handler (make-posn 100 100) "up") (make-posn 100 (- 100 DELTA)))
+(check-expect (keyboard-handler (make-posn 100 100) "down") (make-posn 100 (+ 100 DELTA)))
+(check-expect (keyboard-handler (make-posn 100 100) "right") (make-posn (+ 100 DELTA) 100))
+(check-expect (keyboard-handler (make-posn 100 100) "left") (make-posn (- 100 DELTA) 100))
+(check-expect (keyboard-handler (make-posn 100 100) "k") (make-posn 100 100))
 
-(define (desplazar-figura-teclado estado tecla)
-  (cond [(key=? tecla "up") (make-posn (posn-x estado)(- (posn-y estado) DELTA))]
-        [(key=? tecla "down") (make-posn (posn-x estado)(+ (posn-y estado) DELTA))]
-        [(key=? tecla "right") (make-posn (+ (posn-x estado) DELTA) (posn-y estado))]
-        [(key=? tecla "left") (make-posn (- (posn-x estado) DELTA) (posn-y estado))]
+(define (keyboard-handler estado tecla)
+  (cond [(key=? tecla "up") (if (verificar-mover-teclado estado tecla)
+                                (make-posn (posn-x estado)(- (posn-y estado) DELTA))
+                                (corregir-posicion estado tecla))]
+        
+        [(key=? tecla "down") (if (verificar-mover-teclado estado tecla)
+                                  (make-posn (posn-x estado)(+ (posn-y estado) DELTA))
+                                  (corregir-posicion estado tecla))]
+        
+        [(key=? tecla "right") (if (verificar-mover-teclado estado tecla)
+                                   (make-posn (+ (posn-x estado) DELTA) (posn-y estado))
+                                   (corregir-posicion estado tecla))]
+        
+        [(key=? tecla "left") (if (verificar-mover-teclado estado tecla)
+                                   (make-posn (- (posn-x estado) DELTA) (posn-y estado))
+                                   (corregir-posicion estado tecla))]
+        [(or (key=? tecla "q") (key=? tecla "Q")) FINAL-STATE]
         [else estado]
         )
   )
@@ -56,6 +111,12 @@
 ;Dadas las coordenadas donde se hizo click, nos determina si podemos
 ;colocar la imagen sin que se salga de la escena.
 
+(check-expect (verificador-mover-mouse 0 0) #f)
+(check-expect (verificador-mover-mouse ANCHO-ESCENA ALTO-ESCENA) #f)
+(check-expect (verificador-mover-mouse 0 ALTO-ESCENA) #f)
+(check-expect (verificador-mover-mouse ANCHO-ESCENA 0) #f)
+(check-expect (verificador-mover-mouse (/ ANCHO-ESCENA 2)(/ ALTO-ESCENA 2)) #t)
+
 (define (verificador-mover-mouse x y)
   (and (<= x (- ANCHO-ESCENA RADIO-CIRCULO))
        (>= x RADIO-CIRCULO)
@@ -64,31 +125,31 @@
        )
   )
 
-;corrector-posicion: Number Number -> Estado
-;Dada las coordenadas actuales (para saber donde se encuentra ubicada la figura),
-;nos devuelve una posicion corregida la cual es adyacente a los bordes de la escena.
- 
-
-(define (corrector-posicion x y)
-  
-  )
-
-;mover-figura-mouse: Estado Number Number String -> Estado
+;mouse-handler: Estado Number Number String -> Estado
 ;Dado el estado actual, nos devuelve un nuevo estado de acuerdo a donde
 ;se presiono el mouse dentro de la escena.
 
-(define (mover-figura-mouse estado x y tipo)
+(define (mouse-handler estado x y tipo)
   (cond [(string=? tipo "button-down") (if (not (verificador-mover-mouse x y))
-                                           (corrector-posicion x y)
+                                           estado
                                            (make-posn x y))]
         [else estado])
   )
 
+;detect-final-state: Estado -> Boolean
+;Nos devuelve #t si el estado es el FINAL-STATE, en caso contrario devuelve #f.
 
-(define ESTADO-INICIAL (make-posn (/ ANCHO-ESCENA 2)(/ ALTO-ESCENA 2)))
+(check-expect (detect-final-state (make-posn 3 3)) #f)
+(check-expect (detect-final-state FINAL-STATE) #t)
 
-(big-bang ESTADO-INICIAL
-  [to-draw representador-estado]
-  [on-key desplazar-figura-teclado]
-  [on-mouse mover-figura-mouse]
+(define (detect-final-state state)
+  (posn=? state FINAL-STATE)
+  )
+
+
+(big-bang INITIAL-STATE
+  [to-draw render-state]
+  [on-key keyboard-handler]
+  [on-mouse mouse-handler]
+  [stop-when detect-final-state render-state]
   )
