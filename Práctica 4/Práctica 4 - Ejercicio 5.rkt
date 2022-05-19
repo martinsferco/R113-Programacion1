@@ -106,22 +106,60 @@
         )
   )
 
+;corregir-posx: Number -> Number
+;Dado donde se clickeo horizontalmente, nos devuelve una coordenada que haga que el circulo
+;quede en el borde de la escena (en el sentido X).
 
-;verificador-mover-mouse: Number Number -> Boolean
-;Dadas las coordenadas donde se hizo click, nos determina si podemos
+(check-expect (corregir-posx 1) RADIO-CIRCULO)
+(check-expect (corregir-posx (- ANCHO-ESCENA 1)) (- ANCHO-ESCENA RADIO-CIRCULO))
+
+(define (corregir-posx x)
+              (if (> x (/ ANCHO-ESCENA 2))
+                  (- ANCHO-ESCENA RADIO-CIRCULO)
+                  RADIO-CIRCULO
+                  )
+  )
+
+;corregir-posy: Number -> Number
+;Dado donde se clickeo verticalmente, nos devuelve una coordenada que haga que el circulo
+;quede en el borde de la escena (en el sentido Y).
+
+(check-expect (corregir-posy 1) RADIO-CIRCULO)
+(check-expect (corregir-posy (- ALTO-ESCENA 1)) (- ALTO-ESCENA RADIO-CIRCULO))
+
+(define (corregir-posy y)
+              (if (> y (/ ANCHO-ESCENA 2))
+                  (- ALTO-ESCENA RADIO-CIRCULO)
+                  RADIO-CIRCULO
+                  )
+  )
+
+;verificador-x: Number -> Boolean
+;Dadas las coordenadas horizontales donde se hizo click, nos determina si podemos
 ;colocar la imagen sin que se salga de la escena.
 
-(check-expect (verificador-mover-mouse 0 0) #f)
-(check-expect (verificador-mover-mouse ANCHO-ESCENA ALTO-ESCENA) #f)
-(check-expect (verificador-mover-mouse 0 ALTO-ESCENA) #f)
-(check-expect (verificador-mover-mouse ANCHO-ESCENA 0) #f)
-(check-expect (verificador-mover-mouse (/ ANCHO-ESCENA 2)(/ ALTO-ESCENA 2)) #t)
+(check-expect (verificador-x  0) #f)
+(check-expect (verificador-x ANCHO-ESCENA) #f)
+(check-expect (verificador-x (/ ANCHO-ESCENA 2)) #t)
 
-(define (verificador-mover-mouse x y)
+(define (verificador-x x)
   (and (<= x (- ANCHO-ESCENA RADIO-CIRCULO))
        (>= x RADIO-CIRCULO)
+       )
+  )
+
+
+;verificador-y: Number -> Boolean
+;Dadas las coordenadas verticales donde se hizo click, nos determina si podemos
+;colocar la imagen sin que se salga de la escena.
+
+(check-expect (verificador-y  0) #f)
+(check-expect (verificador-y ALTO-ESCENA) #f)
+(check-expect (verificador-y (/ ALTO-ESCENA 2)) #t)
+
+(define (verificador-y y)
+  (and (<= y (- ALTO-ESCENA RADIO-CIRCULO))
        (>= y RADIO-CIRCULO)
-       (<= y (- ALTO-ESCENA RADIO-CIRCULO))
        )
   )
 
@@ -130,9 +168,11 @@
 ;se presiono el mouse dentro de la escena.
 
 (define (mouse-handler estado x y tipo)
-  (cond [(string=? tipo "button-down") (if (not (verificador-mover-mouse x y))
-                                           estado
-                                           (make-posn x y))]
+  (cond [(string=? tipo "button-down") (cond [(and (verificador-x x)(verificador-y y)) (make-posn x y)]
+                                             [(verificador-x x) (make-posn x (corregir-posy y))]
+                                             [(verificador-y y) (make-posn (corregir-posx x) y)]
+                                             [else (make-posn (corregir-posx x) (corregir-posy y))]
+                                             )]
         [else estado])
   )
 

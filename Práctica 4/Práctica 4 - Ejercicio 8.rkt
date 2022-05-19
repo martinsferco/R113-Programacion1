@@ -91,7 +91,13 @@
         )
   )
 
-;CAMBIAR PARA QUE NO SE VAYA HORIZONTALMENTE
+
+;verificador-horizontal: Estado -> Boolean
+;Nos determina si un estado entra completamente dentro de la pantalla horizontalmente hablando.
+
+(define (verificador-horizontal estado)
+  (< (image-width (text (Texto-s estado) (Texto-tam estado) (Texto-color estado))) ANCHO-ESCENA)
+  )
 
 ;cambio-tam: Estado Tecla -> Estado
 ;Dado el estado actual, nos achica o agranda el estado depende si presionamos
@@ -136,8 +142,17 @@
                                               (Texto-tam estado)))]
         
         [(tecla-f? tecla) (colorearF estado tecla)]
-        [(or (key=? tecla "up") (key=? tecla "down")) (cambio-tam estado tecla)]
-        [else (make-Texto (string-append (Texto-s estado) tecla) (Texto-color estado) (Texto-tam estado))]
+        [(key=? tecla "up") (if (verificador-horizontal (cambio-tam estado tecla))
+                                                          (cambio-tam estado tecla)
+                                                          estado)]
+        [(key=? tecla "down") (cambio-tam estado tecla)]
+        [else (if (verificador-horizontal (make-Texto (string-append (Texto-s estado) tecla) ;Preguntamos si se sale de pantalla
+                                                      (Texto-color estado)
+                                                      (Texto-tam estado)))
+                  (make-Texto (string-append (Texto-s estado) tecla) ;Si no se sale de pantalla lo mostramos
+                              (Texto-color estado)
+                              (Texto-tam estado))
+                  estado)]
         )
   
   )
