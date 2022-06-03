@@ -52,8 +52,7 @@
 
 (define (contiene-Marcos? l)
          (cond [(empty? l) #f]
-               [(cons? l) (if (string=? (first l) "Marcos")
-                              #t
+               [(cons? l) (or (string=? "Marcos" (first l))
                               (contiene-Marcos? (rest l)))]
                ))
 
@@ -74,11 +73,10 @@
 (check-expect (contiene? (cons "Juan" '()) "Marcos") #false)
 (check-expect (contiene? (cons "Marcos" '()) "Marcos") #true)
 
-(define (contiene? l o)
+(define (contiene? l objetivo)
   (cond [(empty? l) #f]
-        [(cons? l) (if (string=? (first l) o)
-                       #t
-                       (contiene? (rest l) o))])
+        [(cons? l) (or (string=? objetivo (first l))
+                       (contiene? (rest l) objetivo))])
   )
 
 ;__________________________________________
@@ -197,4 +195,346 @@
 (define (promedio l)
   (cond [(empty? l) 0]
         [(cons? l) (/ (suma l) (cant-elementos l))])
+  )
+
+;__________________________________________
+;Ejercicio 12)
+
+;pares: List(Number) -> List(Number)
+;Dada una Lista-de-numeros, nos devuelve una nueva List(Number) con los elementos
+;que sean pares.
+
+(check-expect (pares (list 4 6 3 7 5 0)) (list 4 6 0))
+(check-expect (pares empty) empty)
+(check-expect (pares (list 1 3 5)) empty)
+
+(define (pares l)
+  (cond [(empty? l) empty]
+        [(cons? l) (if (= 0 (modulo (first l) 2))
+                       (cons (first l) (pares (rest l)))
+                       (pares (rest l)))]
+        )
+  )
+
+;__________________________________________
+;Ejercicio 13)
+
+;cortas: List(String) -> List(String)
+;Dada una List(String), nos devuelve una nueva List(String) con todas
+;las palabras que tengan una longitud menor a 6.
+
+(check-expect (cortas (list "Lista" "de" "palabras" "sin" "sentido")) (list "de" "sin"))
+(check-expect (cortas empty) empty)
+(check-expect (cortas (list "HOLLA" "HOLAA")) empty)
+
+(define (cortas l)
+  (cond [(empty? l) empty]
+        [(cons? l) (if (< (string-length (first l)) 5)
+                   (cons (first l) (cortas (rest l)))
+                   (cortas (rest l)))])
+  )
+
+;__________________________________________
+;Ejercicio 14)
+
+;mayores: List(Number) Number -> List(Number)
+;Dada una Lista-de-numeros y un N, nos devuelve una nueva Lista-de-numeros formada
+;por los elementos que sean mayores a N.
+
+(check-expect (mayores (list 1 2 3 4) 5) empty)
+(check-expect (mayores (list 1 2 3 4) 2) (list 3 4))
+(check-expect (mayores empty 3) empty)
+(check-expect (mayores (list 1 2 3 4) 0) (list 1 2 3 4))
+
+(define (mayores l n)
+  (cond [(empty? l) empty]
+        [(cons? l) (if (> (first l) n)
+                       (cons (first l) (mayores (rest l) n))
+                       (mayores (rest l) n))])
+  )
+
+;__________________________________________
+;Ejercicio 15)
+
+;Los datos que le pasaremos serán del tipo List(posn)
+
+;distancia: posn -> Number
+;Dado un punto del espacio nos devuelve su distancia al origen.
+
+(check-expect (distancia (make-posn 4 3)) 5)
+(check-expect (distancia (make-posn 4 0)) 4)
+(check-expect (distancia (make-posn 0 0)) 0)
+
+(define (distancia p)
+  (sqrt (+ (sqr (posn-x p)) (sqr (posn-y p))))
+  )
+
+;cerca: List(posn) Number -> List(posn)
+;Dada una lista con puntos del espacio y una distancia máxima, nos devuelve una lista
+;con los puntos cuya distancia al origen sea menor a la distancia máxima.
+
+(check-expect (cerca empty 5) empty)
+(check-expect (cerca (list (make-posn 3 4) (make-posn 10 10)) 5) empty)
+(check-expect (cerca (list (make-posn 1 1) (make-posn 10 10)) 5) (list (make-posn 1 1)))
+(check-expect (cerca (list (make-posn 1 1) (make-posn 10 10)) 0) empty)
+
+(define (cerca l max)
+  (cond [(empty? l) empty]
+        [(cons? l) (if (< (distancia (first l)) max)
+                       (cons (first l) (cerca (rest l) max))
+                       (cerca (rest l) max))]
+        )
+  )
+
+;__________________________________________
+;Ejercicio 16)
+
+;positivos: List(Number) -> List(Number)
+;Dada una lista de números, nos devuelve una nueva lista con aquellos elementos
+;que sean mayores a 0.
+
+(check-expect (positivos (list 1 2 3 4)) (list 1 2 3 4))
+(check-expect (positivos (list 1 2 3 -54)) (list 1 2 3))
+(check-expect (positivos (list -2 -3 -4)) empty)
+(check-expect (positivos empty) empty)
+
+(define (positivos l)
+  (cond [(empty? l) empty]
+        [(cons? l) (if (> (first l) 0)
+                       (cons (first l) (positivos (rest l)))
+                       (positivos (rest l)))]))
+
+
+;__________________________________________
+;Ejercicio 17)
+
+;eliminar: List(Number) Number -> List(Number)
+;Dada una lista de números y un números, nos devuelve una nueva lista en la cual
+;no aparece ninguna el vez el número que le pasamos.
+
+(check-expect (eliminar (list 1 2 3 4) 5) (list 1 2 3 4))
+(check-expect (eliminar (list 1 2 3 4) 4) (list 1 2 3))
+(check-expect (eliminar (list 1 4 3 4) 4) (list 1 3))
+(check-expect (eliminar (list 5 5 5 5) 5) empty)
+(check-expect (eliminar empty 5) empty)
+
+(define (eliminar l n)
+  (cond [(empty? l) empty]
+        [(cons? l) (if (not (= n (first l)))
+                       (cons (first l) (eliminar (rest l) n))
+                       (eliminar (rest l) n))]))
+
+;__________________________________________
+;Ejercicio 18)
+
+;raices: List(Number) -> List(Number)
+;Dada una lista de numeros, nos devuelve una nueva lista con todas las raices
+;cuadradas de los elementos de la primer lista.
+;Aquellos los numeros que sean menores a 0, no le calcularemos su raiz.
+
+(check-expect (raices (list 1 4 9 16)) (list 1 2 3 4))
+(check-expect (raices empty) empty)
+(check-expect (raices (list -1 -2 0 4 9 -5)) (list 0 2 3))
+
+(define (raices l)
+  (cond [(empty? l) empty]
+        [(cons? l) (if (>= (first l) 0)
+                       (cons (sqrt (first l)) (raices (rest l)))
+                       (raices (rest l)))]
+        )
+  )
+
+;__________________________________________
+;Ejercicio 19)
+
+;A la lista de puntos en el plano, la representamos con una lista
+;cuyos elementos son datos de tipo posn.
+
+;distancias: List(posn) -> List(Number)
+;Dada una lista de puntos en el espacio, nos determina la distancia
+;al origen de cada uno de los puntos.
+
+(check-expect (distancias (list (make-posn 3 4) (make-posn 10 0))) (list 5 10))
+(check-expect (distancias empty) empty)
+
+(define (distancias lp)
+  (cond [(empty? lp) empty]
+        [(cons? lp) (cons (distancia (first lp)) (distancias (rest lp)))])
+  )
+
+;__________________________________________
+;Ejercicio 20)
+
+;anchos: List(Image) -> List(Number)
+;Dada una lista de imagenes, nos devuelve una nueva lista con los anchos
+;de las mismas.
+
+(check-expect (anchos empty) empty)
+(check-expect (anchos (list (circle 30 "solid" "red") (rectangle 10 30 "outline" "blue"))) (list 60 10))
+
+(define (anchos li)
+  (cond [(empty? li) empty]
+        [(cons? li) (cons (image-width (first li)) (anchos (rest li)))])
+  )
+
+;__________________________________________
+;Ejercicio 21)
+
+;signo: Number -> Number
+;Toma un numero como argumento y devuelve 0 si es 0, 1 si es positivo
+;y -1 si es negativo
+
+(check-expect (signo 0) 0)
+(check-expect (signo 4) 1)
+(check-expect (signo -4) -1)
+
+(define (signo x)
+        (cond [(< x 0) -1]
+              [(= x 0) 0]
+              [(> x 0) 1]
+              )
+  )
+
+;signos: List(Number) -> List(Number)
+;Dada una lista de numeros nos devuelve una lista con los signos de
+;cada uno de los elementos, de acuerdo a la funcion signo.
+
+(check-expect (signos (list 0 1 2 0 -4 -4 2)) (list 0 1 1 0 -1 -1 1))
+(check-expect (signos empty) empty)
+(check-expect (signos (list -2 -1 0 0 1 2)) (list -1 -1 0 0 1 1))
+
+(define (signos l)
+  (cond [(empty? l) empty]
+        [(cons? l) (cons (signo (first l)) (signos (rest l)))])
+  )
+
+;__________________________________________
+;Ejercicio 22)
+
+;cuadrados: List(Number) -> List(Number)
+;Dada una lista de numeros, nos devuelve una lista con los cuadrados
+;de los elementos de la primera lista.
+
+(check-expect (cuadrados (list 1 2 3 4)) (list 1 4 9 16))
+(check-expect (cuadrados empty) empty)
+(check-expect (cuadrados (list -2 -1 0 1 2)) (list 4 1 0 1 4))
+
+(define (cuadrados l)
+  (cond [(empty? l) empty]
+        [(cons? l) (cons (sqr (first l)) (cuadrados (rest l)))])
+  )
+
+;__________________________________________
+;Ejercicio 23)
+
+;longitudes: List(String) -> List(Number)
+;Dada una lista de strings, nos devuelve una lista con las longitudes
+;de los mismos.
+
+(check-expect (longitudes (list "hola" "" "Martin")) (list 4 0 6))
+(check-expect (longitudes empty) empty)
+
+(define (longitudes l)
+  (cond [(empty? l) empty]
+        [(cons? l) (cons (string-length (first l)) (longitudes (rest l)))])
+  )
+
+;__________________________________________
+;Ejercicio 24)
+
+;Como datos, utilizaremos una lista del tipo listTemperaturas.
+;listTemperaturas es:
+;'()
+;(cons Number listTemperaturas)
+
+;convertirFC: listTemperaturas -> listTemperaturas
+;Dada una lista de temperaturas en Fahrenheit, nos devuelve una lista
+;con las conversiones de la misma en grados Celcius.
+
+(check-within (convertirFC (list 32 100)) (list 0 37.7) 0.10)
+(check-expect (convertirFC empty) empty)
+
+(define (convertirFC l)
+  (cond [(empty? l) empty]
+        [(cons? l) (cons (* (- (first l) 32) 5/9) (convertirFC (rest l)))])
+  )
+
+;__________________________________________
+;Ejercicio 25)
+
+;prod: List(Number) -> Number
+;Dada una lista de numeros, nos devuelve el producto entre ellos.
+
+(check-expect (prod empty) 1)
+(check-expect (prod (list 1 2 3 4 5)) 120)
+(check-expect (prod (list 1 -2 3)) -6)
+
+(define (prod l)
+  (cond [(empty? l) 1]
+        [(cons? l) (* (first l) (prod (rest l)))]
+        )
+  )
+
+;__________________________________________
+;Ejercicio 26)
+
+;pegar: List(String) -> String
+;Dada una lista de Strings, nos devuelve un unico string que resulta
+;de concatenar todos los Strings de la lista dada.
+
+(check-expect (pegar (list "Las " "listas " "son " "faciles.")) "Las listas son faciles.")
+(check-expect (pegar empty) "")
+(check-expect (pegar (list "Hello World!")) "Hello World!")
+
+(define (pegar l)
+  (cond [(empty? l) ""]
+        [(cons? l) (string-append (first l) (pegar (rest l)))])
+  )
+
+;__________________________________________
+;Ejercicio 27)
+
+;maximo: List(Number) -> Number
+;Dada una lista de numeros naturales (positivos), nos devuelve el
+;maximo de ellos.
+
+(check-expect (maximo (list 1 2 3)) 3)
+(check-expect (maximo empty) 0)
+(check-expect (maximo (list 3 2 1)) 3)
+
+(define (maximo l)
+  (cond [(empty? l) 0]
+        [(cons? l) (max (first l) (maximo (rest l)))])
+  )
+
+;__________________________________________
+;Ejercicio 28)
+
+;sumdist: List(posn) -> Number
+;Dada una lista de puntos, nos devuelve la suma de sus distancia
+;al origen.
+
+(check-expect (sumdist (list (make-posn 3 4) (make-posn 5 0))) 10)
+(check-expect (sumdist empty) 0)
+(check-expect (sumdist (list (make-posn 0 0))) 0)
+
+(define (sumdist l)
+  (cond [(empty? l) 0]
+        [(cons? l) (+ (distancia (first l)) (sumdist (rest l)))])
+  )
+
+;__________________________________________
+;Ejercicio 29)
+
+;sumcuad: List(Number) -> Number
+;Dada una lista de numeros, nos devuelve la suma de sus elementos al
+;cuadrado.
+
+(check-expect (sumcuad (list 3 4)) 25)
+(check-expect (sumcuad empty) 0)
+(check-expect (sumcuad (list 1 2 3)) 14)
+
+(define (sumcuad l)
+  (cond [(empty? l) 0]
+        [(cons? l) (+ (sqr (first l)) (sumcuad (rest l)))])
   )
